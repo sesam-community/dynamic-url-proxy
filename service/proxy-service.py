@@ -25,7 +25,7 @@ GLOBALS = {}
 LOCALS = {"datetime": datetime}
 
 
-def generate_response(response_text, status_code, content_type):
+def generate_response(response_text, status_code, content_type="application/json"):
     return Response(
         response=response_text,
         status=status_code,
@@ -35,18 +35,17 @@ def generate_response(response_text, status_code, content_type):
 @app.route("/", methods=methods)
 def proxy(path=""):
     url = request.args.get("url")
+    if not url:
+        return generate_response(
+        json.dumps({
+        "is_success": False,
+        "message": "missing mandatory parameter"
+        }),
+        400)
     if url[0] == "\"" and url[-1] == "\"":
         url = url[1:-1]
     quote_opener = request.args.get("quote_opener", "[")
     quote_closer = request.args.get("quote_closer", "]")
-    if not url:
-        return generate_response(
-            json.dumps({
-                "is_success": False,
-                "message": "missing mandatory parameter"
-            }),
-            400,
-            "application/json")
 
     params2forward = dict([])
     logger.debug(request.args)
@@ -79,8 +78,7 @@ def proxy(path=""):
                 "is_success": False,
                 "message": str(e)
             }),
-            500,
-            "application/json")
+            500)
 
 
 if __name__ == '__main__':
