@@ -3,11 +3,11 @@ from flask import Flask, request, Response
 import os
 import json
 import datetime
-import logger
+import logger as log
 
 app = Flask(__name__)
 
-logger = logger.Logger("dynamic-url-proxy", os.environ.get("LOGLEVEL", "INFO"))
+logger = log.init_logger("dynamic-url-proxy", os.environ.get("LOGLEVEL", "INFO"))
 
 methods = [
     "GET",
@@ -81,10 +81,28 @@ def proxy(path=""):
             500)
 
 
-if __name__ == '__main__':
-    app.run(
-        threaded=True,
-        debug=True,
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT",
-                                5000)))
+if __name__ == "__main__":
+    if os.environ.get("WEBFRAMEWORK", "").lower() == "flask":
+        app.run(
+            threaded=True,
+            debug=True,
+            host="0.0.0.0",
+            port=int(os.environ.get("PORT", 5000)))
+    else:
+        import cherrypy
+
+        app = log.add_access_logger(app, logger)
+        cherrypy.tree.graft(app, "/")
+
+        # Set the configuration of the web server to production mode
+        cherrypy.config.update({
+            "environment": "production",
+            "engine.autoreload_on": False,
+            "log.screen": True,
+            "server.socket_port": int(os.environ.get("PORT", 5000)),
+            "server.socket_host": "0.0.0.0"
+        })
+
+        # Start the CherryPy WSGI web server
+        cherrypy.engine.start()
+        cherrypy.engine.block()

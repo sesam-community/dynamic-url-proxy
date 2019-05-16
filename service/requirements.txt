@@ -1,2 +1,4 @@
 Flask==1.0.2
 requests==2.21.0
+paste==3.0.8
+cherrypy==18.1.1 
