@@ -4,6 +4,7 @@ import os
 import json
 import datetime
 import logger as log
+import dateutil.relativedelta
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ methods = [
 ]
 
 GLOBALS = {}
-LOCALS = {"datetime": datetime}
+LOCALS = {"datetime": datetime, "dateutil": dateutil}
 
 
 def generate_response(response_text, status_code, content_type="application/json"):
