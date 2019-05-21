@@ -11,7 +11,7 @@ For every dynamic part in your url:
   * replace it by [<part_name>]
   * add a query parameter <part_name>=<python_function_to_be_evaluated>
 
-It is only datetime module that are made available to 'eval' additonally to builtins module. You will have to customize after your needs, if any.
+Check the LOCALS variable value in the [code](./service/proxy-service.py#L25) to see the modules available to 'eval' function in addition to builtins module. You will have to customize after your needs, if any.
 
 ### example config in SESAM
 system:
